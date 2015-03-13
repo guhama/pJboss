@@ -1,0 +1,26 @@
+GIT
+  remote: ssh://git@code/github/puppet-nexus.git
+  ref: master
+  sha: 07a3bca8f8a329c90b37f7d5f5639c67ad3a0a34
+  specs:
+    nexus (0.0.1)
+
+GIT
+  remote: ssh://git@code/github/puppet-wget.git
+  ref: master
+  sha: 7b8fcbf7ffd35f7555c0e9748bc2cc8e36209c57
+  specs:
+    wget (1.2.3)
+
+GIT
+  remote: ssh://git@code/github/puppetlabs-stdlib.git
+  ref: master
+  sha: 44c181ec0e230768b8dce10de57f9b32638e66e1
+  specs:
+    stdlib (4.1.0)
+
+DEPENDENCIES
+  nexus (>= 0)
+  stdlib (>= 0)
+  wget (>= 0)
+

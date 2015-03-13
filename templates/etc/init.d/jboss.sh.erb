@@ -1,0 +1,106 @@
+#!/bin/bash
+#### BEGIN INIT INFO
+# Provides: jboss
+# Required-Start: $local_fs $remote_fs $network $syslog
+# Required-Stop: $local_fs $remote_fs $network $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start/Stop JBoss EAP 6.1 (built out of JBoss AS 7)
+### END INIT INFO
+# chkconfig: 35 92 1
+# processname: jboss
+
+JAVA_OPTS='<%= scope.lookupvar('jboss::service::java_opts') %>'
+JAVA_HOME=<%= scope.lookupvar('jboss::service::java_home') %>
+JBOSS_HOME=<%= scope.lookupvar('jboss::service::jboss_home') %>
+JBOSS_USER=<%= scope.lookupvar('jboss::service::user') %>
+JBOSS_PIDFILE=<%= scope.lookupvar('jboss::service::pid_path') %>/jboss.pid
+JBOSS_CONSOLE_LOG=<%= scope.lookupvar('jboss::service::log_path') %>/jboss.log
+
+my_id=`/usr/bin/whoami`
+
+check_status() {
+  if [ -f $JBOSS_PIDFILE ]; then
+    read ppid < $JBOSS_PIDFILE
+    if [ `ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null` -eq '1' ]; then
+      echo "[JBOSS] $0 is running (pid $ppid)"
+      return 0
+    else
+      echo "[JBOSS] $0 dead but pid file exists"
+      return 1
+    fi
+  fi
+  echo "[JBOSS] $0 is not running"
+  return 3
+}
+
+status() {
+  check_status
+  local status_flag=$? # return value of status call above
+  exit $status_flag
+}
+
+start() {
+  check_status
+  local status_flag=$? # return value of status call above
+  if [ $status_flag -ne 0 ]; then
+    echo "[JBOSS] Starting JBoss..."
+    if [[ "$my_id" == "${JBOSS_USER}" ]]
+    then
+      sh -c "JAVA_OPTS='${JAVA_OPTS}' JAVA_HOME='${JAVA_HOME}' LAUNCH_JBOSS_IN_BACKGROUND=1 JBOSS_PIDFILE='${JBOSS_PIDFILE}' '${JBOSS_HOME}/bin/standalone.sh' -b=<%= scope.lookupvar('jboss::service::bind_address') %>" 2>&1 >> "${JBOSS_CONSOLE_LOG}" &
+    else
+      sudo su -m -l "${JBOSS_USER}" -c "JAVA_OPTS='${JAVA_OPTS}' JAVA_HOME='${JAVA_HOME}' LAUNCH_JBOSS_IN_BACKGROUND=1 JBOSS_PIDFILE='${JBOSS_PIDFILE}' '${JBOSS_HOME}/bin/standalone.sh' -b=<%= scope.lookupvar('jboss::service::bind_address') %>" 2>&1 >> "${JBOSS_CONSOLE_LOG}" &
+      chown "${JBOSS_USER}":"${JBOSS_USER}" "${JBOSS_CONSOLE_LOG}"
+    fi
+  else
+    echo "[JBOSS] JBoss is already running..."
+  fi
+}
+
+stop() {
+  check_status
+  local status_flag=$? # return value of status call above
+  if [ $status_flag -eq 0 ]; then
+    echo "[JBOSS] Stopping JBoss..."
+    read ppid < $JBOSS_PIDFILE
+    if [[ "$my_id" == "${JBOSS_USER}" ]]
+    then
+      kill -9 $ppid
+    else
+      sudo su -m -l $JBOSS_USER -c "kill -9 $ppid"
+    fi
+  else
+    echo "[JBOSS] JBoss is not running..."
+  fi
+}
+
+restart() {
+  check_status
+  local status_flag=$? # return value of status call above
+  if [ $status_flag -eq 0 ]; then
+    stop
+    sleep 2
+    start
+  else
+    start
+  fi
+}
+
+usage() {
+  echo "[JBOSS] Usage: /etc/init.d/jboss {status|start|stop|restart}"; exit 1;
+}
+
+case "$1" in
+  start) start
+  ;;
+  stop) stop
+  ;;
+  restart) restart
+  ;;
+  status) status
+  ;;
+  *) usage
+  ;;
+esac
+
+exit 0

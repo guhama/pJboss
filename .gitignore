@@ -1,0 +1,11 @@
+.tmp/
+.librarian
+.rspec_system/
+modules/
+spec/fixtures/modules/
+spec/fixtures/**/*.zip
+target/
+.vendors/
+.bundle/
+reports/
+.vagrant/

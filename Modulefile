@@ -1,0 +1,10 @@
+name 'premierinc-jboss'
+version '0.0.1'
+
+author 'Borges, Diego'
+license 'MIT'
+project_page 'http://code.premierinc.com/source/projects/PUPPET/repos/premierinc-jboss'
+source 'http://code.premierinc.com/source/projects/PUPPET/repos/premierinc-jboss'
+summary 'Puppet module to deploy JBoss Application Server'
+description 'Provides a flexible installation and configuration mechanism for JBoss As.'
+#dependency 'maestrodev/wget', '1.2.2'

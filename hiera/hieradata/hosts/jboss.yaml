@@ -1,0 +1,17 @@
+---
+java_opts: '-Xms512m -Xmx1g -XX:MaxPermSize=512m -Djava.awt.headless=true -Dimm.mode=TEST'
+ssl_password: 'BlueMonkey'
+  # password = premier1
+jboss_password: '$1$szJMjirc$GreoKE6hluP4ZBqkyPfV5.'
+datasources:
+  test1:
+    url: 'jdbc:oracle:thin:@//test1.premierinc.com:1521/change_me'
+    jndi_name: 'java:/datasource/test1'
+    username: 'test1usr'
+    password: 'test1pass'
+  test2:
+    url: 'jdbc:oracle:thin:@//test2.premierinc.com:1521/change_me'
+    jndi_name: 'java:/datasource/test2'
+    username: 'test2usr'
+    password: 'test2pass'
+    pool_name: 'test2-db-pool
